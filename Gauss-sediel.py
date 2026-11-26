@@ -1,58 +1,56 @@
-# Metodo iterativo de Gauss-Seidel
+
+# METODO ITERATIVO DE GAUSS-SEIDEL
 
 # Valores iniciales
-x = 1
-y = 2
-z = 2
+x = 1.0
+y = 2.0
+z = 2.0
 
-# Tolerancia
-tol = 0.0001
-
-# Numero maximo de iteraciones
-max_iter = 100
-
-# Contador
+# Configuracion
+tolerancia = 0.0001
+max_iteraciones = 100
 k = 0
 
-print("Metodo de Gauss-Seidel")
-print("----------------------------------")
+print("METODO DE GAUSS-SEIDEL")
+print("=" * 55)
 
-while k < max_iter:
+while k < max_iteraciones:
 
-    # Calculamos x usando los valores anteriores de y y z
-    x_nuevo = (7 + y - z) / 4
+    # Guardamos los valores de la iteracion anterior
+    x_anterior = x
+    y_anterior = y
+    z_anterior = z
 
-    # Calculamos y usando el nuevo x
-    y_nuevo = (21 + 4*x_nuevo + z) / 8
+    # Calculamos x con los valores anteriores de y y z
+    x = (7 + y_anterior - z_anterior) / 4
 
-    # Calculamos z usando el nuevo x y el nuevo y
-    z_nuevo = (15 + 2*x_nuevo - y_nuevo) / 5
+    # Usamos inmediatamente el NUEVO valor de x
+    y = (21 + 4*x + z_anterior) / 8
 
-    # Calculamos el error
-    error = max(abs(x_nuevo - x),
-                abs(y_nuevo - y),
-                abs(z_nuevo - z))
+    # Usamos el NUEVO valor de x y el NUEVO valor de y
+    z = (15 + 2*x - y) / 5
 
-    # Actualizamos los valores
-    x = x_nuevo
-    y = y_nuevo
-    z = z_nuevo
+    # Calculamos el error maximo
+    error = max(
+        abs(x - x_anterior),
+        abs(y - y_anterior),
+        abs(z - z_anterior)
+    )
 
-    k = k + 1
+    k += 1
 
-    print("Iteracion:", k)
-    print("x =", x)
-    print("y =", y)
-    print("z =", z)
-    print("Error =", error)
-    print("----------------------------------")
+    print(f"\nIteracion {k}")
+    print(f"x = {x:.8f}")
+    print(f"y = {y:.8f}")
+    print(f"z = {z:.8f}")
+    print(f"Error = {error:.8f}")
 
-    # Condicion de parada
-    if error < tol:
+    if error < tolerancia:
+        print("\nSe alcanzo la tolerancia.")
         break
 
-print("Solucion aproximada:")
-print("x =", x)
-print("y =", y)
-print("z =", z)
-print("Iteraciones realizadas:", k)
+print("\nRESULTADO FINAL")
+print(f"x = {x:.8f}")
+print(f"y = {y:.8f}")
+print(f"z = {z:.8f}")
+print(f"Iteraciones realizadas: {k}")

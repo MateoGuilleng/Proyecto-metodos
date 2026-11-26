@@ -1,54 +1,60 @@
-# Metodo iterativo de Jacobi
+
+# METODO ITERATIVO DE JACOBI
 
 # Valores iniciales
-x = 1
-y = 2
-z = 2
+x = 1.0
+y = 2.0
+z = 2.0
 
-# Tolerancia (precision)
-tol = 0.0001
-
-# Numero maximo de iteraciones
-max_iter = 100
-
-# Contador
+# Configuracion
+tolerancia = 0.0001
+max_iteraciones = 100
 k = 0
 
-print("Metodo de Jacobi")
-print("----------------------------------")
+print("METODO DE JACOBI")
+print("=" * 55)
 
-while k < max_iter:
+while k < max_iteraciones:
 
-    # Calculamos los nuevos valores usando los valores anteriores
-    x_nuevo = (7 + y - z) / 4
-    y_nuevo = (21 + 4*x + z) / 8
-    z_nuevo = (15 + 2*x - y) / 5
+    # Guardamos los valores anteriores
+    x_anterior = x
+    y_anterior = y
+    z_anterior = z
 
-    # Calculamos el error
-    error = max(abs(x_nuevo - x),
-                abs(y_nuevo - y),
-                abs(z_nuevo - z))
+    # Calculamos TODOS los nuevos valores usando
+    # exclusivamente los valores anteriores
+    x_nuevo = (7 + y_anterior - z_anterior) / 4
+    y_nuevo = (21 + 4*x_anterior + z_anterior) / 8
+    z_nuevo = (15 + 2*x_anterior - y_anterior) / 5
 
-    # Actualizamos los valores
+    # Calculamos el error maximo de esta iteracion
+    error = max(
+        abs(x_nuevo - x_anterior),
+        abs(y_nuevo - y_anterior),
+        abs(z_nuevo - z_anterior)
+    )
+
+    # Ahora si actualizamos todas las variables
     x = x_nuevo
     y = y_nuevo
     z = z_nuevo
 
-    k = k + 1
+    k += 1
 
-    print("Iteracion:", k)
-    print("x =", x)
-    print("y =", y)
-    print("z =", z)
-    print("Error =", error)
-    print("----------------------------------")
+    print(f"\nIteracion {k}")
+    print(f"x = {x:.8f}")
+    print(f"y = {y:.8f}")
+    print(f"z = {z:.8f}")
+    print(f"Error = {error:.8f}")
 
-    # Condicion de parada
-    if error < tol:
+    # Si el error es suficientemente pequeno,
+    # detenemos el proceso
+    if error < tolerancia:
+        print("\nSe alcanzo la tolerancia.")
         break
 
-print("Solucion aproximada:")
-print("x =", x)
-print("y =", y)
-print("z =", z)
-print("Iteraciones realizadas:", k)
+print("\nRESULTADO FINAL")
+print(f"x = {x:.8f}")
+print(f"y = {y:.8f}")
+print(f"z = {z:.8f}")
+print(f"Iteraciones realizadas: {k}")
