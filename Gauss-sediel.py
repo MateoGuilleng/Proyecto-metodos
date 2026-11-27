@@ -1,37 +1,28 @@
 import numpy as np
 
-print("Metodo iterativo de Gauss-Seidel")
+print("Metodo iterativo de Gauss-Seidel (tamano n x n)\n")
 
-print("Ecuacion: a*x + b*y + c*z = d\n")
+n = int(input("Ingrese el tamano n de la matriz cuadrada (ejemplo: 2, 3, 4): "))
+if n <= 0:
+    print("\nError: el tamano de la matriz debe ser un entero positivo.")
+    exit()
 
-a1 = float(input("Ecuacion 1 - coeficiente de x (a1): "))
-b1 = float(input("Ecuacion 1 - coeficiente de y (b1): "))
-c1 = float(input("Ecuacion 1 - coeficiente de z (c1): "))
-d1 = float(input("Ecuacion 1 - termino independiente (d1): "))
+A = np.zeros((n, n), dtype=float)
+b = np.zeros(n, dtype=float)
 
-print()
-a2 = float(input("Ecuacion 2 - coeficiente de x (a2): "))
-b2 = float(input("Ecuacion 2 - coeficiente de y (b2): "))
-c2 = float(input("Ecuacion 2 - coeficiente de z (c2): "))
-d2 = float(input("Ecuacion 2 - termino independiente (d2): "))
+print("\nIngrese los coeficientes de la matriz A y el termino independiente b:")
+for i in range(n):
+    print(f"\n--- Ecuacion {i + 1} ---")
+    for j in range(n):
+        A[i, j] = float(input(f"Coeficiente A[{i + 1},{j + 1}]: "))
+    b[i] = float(input(f"Termino independiente b[{i + 1}]: "))
 
-print()
-a3 = float(input("Ecuacion 3 - coeficiente de x (a3): "))
-b3 = float(input("Ecuacion 3 - coeficiente de y (b3): "))
-c3 = float(input("Ecuacion 3 - coeficiente de z (c3): "))
-d3 = float(input("Ecuacion 3 - termino independiente (d3): "))
-
-if a1 == 0 or b2 == 0 or c3 == 0:
-    print("\nError: los coeficientes en la diagonal (a1, b2, c3) deben ser distintos de cero.")
+# Verificar que ningun elemento de la diagonal principal sea cero
+if np.any(np.diag(A) == 0):
+    print("\nError: todos los elementos de la diagonal principal deben ser distintos de cero.")
     exit()
 
 # Calculo del radio espectral de Gauss-Seidel: T_GS = -(D + L)^(-1) * U
-A = np.array([
-    [a1, b1, c1],
-    [a2, b2, c2],
-    [a3, b3, c3]
-], dtype=float)
-
 D_mas_L = np.tril(A)               # (D + L)
 U = np.triu(A, k=1)                # (U)
 T_GS = -np.linalg.inv(D_mas_L) @ U
@@ -46,57 +37,42 @@ else:
 
 # Pedir valores iniciales
 print("\nValores iniciales:")
-x = float(input("Valor inicial de x: "))
-y = float(input("Valor inicial de y: "))
-z = float(input("Valor inicial de z: "))
+x = np.zeros(n, dtype=float)
+for i in range(n):
+    x[i] = float(input(f"Valor inicial de x[{i + 1}]: "))
 
 # Configuracion
 tolerancia = 0.0001
 max_iteraciones = 100
 k = 0
 
-print("\n Iteraciones")
+print("\nIteraciones")
 
 while k < max_iteraciones:
+    x_anterior = x.copy()
 
-    # Guardamos los valores de la iteracion anterior
-    x_anterior = x
-    y_anterior = y
-    z_anterior = z
+    for i in range(n):
+        # Suma usando valores ya actualizados (j < i) y anteriores (j > i)
+        suma_anteriores = np.dot(A[i, :i], x[:i])
+        suma_siguientes = np.dot(A[i, i + 1:], x_anterior[i + 1:])
+        x[i] = (b[i] - suma_anteriores - suma_siguientes) / A[i, i]
 
-    # Despejamos
-    x = (d1 - b1 * y_anterior - c1 * z_anterior) / a1
-
-    # Usamos nuevo valor de "x"
-    y = (d2 - a2 * x - c2 * z_anterior) / b2
-
-    # Usamos nuevo valor de "x" y "y"
-    z = (d3 - a3 * x - b3 * y) / c3
-
-    # Calculamos el error maximo
-    error = max(
-        abs(x - x_anterior),
-        abs(y - y_anterior),
-        abs(z - z_anterior)
-    )
-
+    error = np.max(np.abs(x - x_anterior))
     k += 1
 
-    print(f"\n Iteracion {k}")
-    print(f"x = {x:.8f}")
-    print(f"y = {y:.8f}")
-    print(f"z = {z:.8f}")
+    print(f"\nIteracion {k}")
+    for i in range(n):
+        print(f"x[{i + 1}] = {x[i]:.8f}")
     print(f"Error = {error:.8f}")
 
     if error < tolerancia:
-        print("\n Se alcanzo la tolerancia.")
+        print("\nSe alcanzo la tolerancia.")
         break
 else:
     print("\nSe alcanzo el maximo de iteraciones sin cumplir la tolerancia.")
 
-print("\n Resultado final")
+print("\nResultado final")
 print(f"Radio espectral rho(T_GS) = {radio_espectral_gs:.6f}")
-print(f"x = {x:.8f}")
-print(f"y = {y:.8f}")
-print(f"z = {z:.8f}")
+for i in range(n):
+    print(f"x[{i + 1}] = {x[i]:.8f}")
 print(f"Iteraciones realizadas: {k}")

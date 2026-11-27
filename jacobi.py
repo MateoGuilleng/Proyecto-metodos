@@ -1,41 +1,31 @@
 import numpy as np
 
-# METODO ITERATIVO DE JACOBI
+# METODO ITERATIVO DE JACOBI (tamano n x n)
 
-print("Metodo iterativo de jacobi")
+print("Metodo iterativo de jacobi\n")
 
-print("Ecuacion: a*x + b*y + c*z = d\n")
+n = int(input("Ingrese el tamano n de la matriz cuadrada (ejemplo: 2, 3, 4): "))
+if n <= 0:
+    print("\nError: el tamano de la matriz debe ser un entero positivo.")
+    exit()
+
+A = np.zeros((n, n), dtype=float)
+b = np.zeros(n, dtype=float)
 
 # Pedir los coeficientes de cada ecuacion
-a1 = float(input("Ecuacion 1 - coeficiente de x (a1): "))
-b1 = float(input("Ecuacion 1 - coeficiente de y (b1): "))
-c1 = float(input("Ecuacion 1 - coeficiente de z (c1): "))
-d1 = float(input("Ecuacion 1 - termino independiente (d1): "))
-
-print()
-a2 = float(input("Ecuacion 2 - coeficiente de x (a2): "))
-b2 = float(input("Ecuacion 2 - coeficiente de y (b2): "))
-c2 = float(input("Ecuacion 2 - coeficiente de z (c2): "))
-d2 = float(input("Ecuacion 2 - termino independiente (d2): "))
-
-print()
-a3 = float(input("Ecuacion 3 - coeficiente de x (a3): "))
-b3 = float(input("Ecuacion 3 - coeficiente de y (b3): "))
-c3 = float(input("Ecuacion 3 - coeficiente de z (c3): "))
-d3 = float(input("Ecuacion 3 - termino independiente (d3): "))
+print("\nIngrese los coeficientes de la matriz A y el termino independiente b:")
+for i in range(n):
+    print(f"\n--- Ecuacion {i + 1} ---")
+    for j in range(n):
+        A[i, j] = float(input(f"Coeficiente A[{i + 1},{j + 1}]: "))
+    b[i] = float(input(f"Termino independiente b[{i + 1}]: "))
 
 # aii diferente a 0
-if a1 == 0 or b2 == 0 or c3 == 0:
-    print("\n Error: los coeficientes en la diagonal (a1, b2, c3) deben ser distintos de cero.")
+if np.any(np.diag(A) == 0):
+    print("\nError: todos los elementos de la diagonal principal deben ser distintos de cero.")
     exit()
 
 # Calculo del radio espectral de Jacobi: T_J = -D^(-1) * (L + U)
-A = np.array([
-    [a1, b1, c1],
-    [a2, b2, c2],
-    [a3, b3, c3]
-], dtype=float)
-
 D = np.diag(np.diag(A))            # D
 L_mas_U = A - D                    # (L + U)
 T_J = -np.linalg.inv(D) @ L_mas_U
@@ -49,55 +39,44 @@ else:
     print("Diagnostico: rho >= 1 -> El metodo NO CONVERGE.")
 
 print("\nValores iniciales:")
-x = float(input("Valor inicial de x: "))
-y = float(input("Valor inicial de y: "))
-z = float(input("Valor inicial de z: "))
+x = np.zeros(n, dtype=float)
+for i in range(n):
+    x[i] = float(input(f"Valor inicial de x[{i + 1}]: "))
 
 # Configuracion
 tolerancia = 0.0001
 max_iteraciones = 100
 k = 0
 
-print("Iteraciones: ")
+print("\nIteraciones:")
 
 while k < max_iteraciones:
+    x_anterior = x.copy()
+    x_nuevo = np.zeros(n, dtype=float)
 
-    x_anterior = x
-    y_anterior = y
-    z_anterior = z
+    for i in range(n):
+        # En Jacobi se usan unicamente valores de la iteracion anterior (x_anterior)
+        suma_otros = np.dot(A[i, :i], x_anterior[:i]) + np.dot(A[i, i + 1:], x_anterior[i + 1:])
+        x_nuevo[i] = (b[i] - suma_otros) / A[i, i]
 
-    x_nuevo = (d1 - b1 * y_anterior - c1 * z_anterior) / a1
-    y_nuevo = (d2 - a2 * x_anterior - c2 * z_anterior) / b2
-    z_nuevo = (d3 - a3 * x_anterior - b3 * y_anterior) / c3
-
-    error = max(
-        abs(x_nuevo - x_anterior),
-        abs(y_nuevo - y_anterior),
-        abs(z_nuevo - z_anterior)
-    )
-
+    error = np.max(np.abs(x_nuevo - x_anterior))
     x = x_nuevo
-    y = y_nuevo
-    z = z_nuevo
-
     k += 1
 
-    print(f"\n Iteracion {k}")
-    print(f"x = {x:.8f}")
-    print(f"y = {y:.8f}")
-    print(f"z = {z:.8f}")
+    print(f"\nIteracion {k}")
+    for i in range(n):
+        print(f"x[{i + 1}] = {x[i]:.8f}")
     print(f"Error = {error:.8f}")
 
-    # Detener proceso si el error es suficientemente pequeño
+    # Detener proceso si el error es suficientemente pequeno
     if error < tolerancia:
         print("\nSe alcanzo la tolerancia.")
         break
 else:
-    print("\n Se alcanzo el maximo de iteraciones sin cumplir la tolerancia.")
+    print("\nSe alcanzo el maximo de iteraciones sin cumplir la tolerancia.")
 
-print("\n Resultado final: ")
+print("\nResultado final:")
 print(f"Radio espectral rho(T_J) = {radio_espectral_j:.6f}")
-print(f"x = {x:.8f}")
-print(f"y = {y:.8f}")
-print(f"z = {z:.8f}")
+for i in range(n):
+    print(f"x[{i + 1}] = {x[i]:.8f}")
 print(f"Iteraciones realizadas: {k}")
