@@ -1,3 +1,5 @@
+import numpy as np
+
 # METODO ITERATIVO DE JACOBI
 
 print("Metodo iterativo de jacobi")
@@ -22,10 +24,29 @@ b3 = float(input("Ecuacion 3 - coeficiente de y (b3): "))
 c3 = float(input("Ecuacion 3 - coeficiente de z (c3): "))
 d3 = float(input("Ecuacion 3 - termino independiente (d3): "))
 
-# aii diferente a 0 
+# aii diferente a 0
 if a1 == 0 or b2 == 0 or c3 == 0:
     print("\n Error: los coeficientes en la diagonal (a1, b2, c3) deben ser distintos de cero.")
     exit()
+
+# Calculo del radio espectral de Jacobi: T_J = -D^(-1) * (L + U)
+A = np.array([
+    [a1, b1, c1],
+    [a2, b2, c2],
+    [a3, b3, c3]
+], dtype=float)
+
+D = np.diag(np.diag(A))            # D
+L_mas_U = A - D                    # (L + U)
+T_J = -np.linalg.inv(D) @ L_mas_U
+valores_propios_j = np.linalg.eigvals(T_J)
+radio_espectral_j = np.max(np.abs(valores_propios_j))
+
+print(f"\nRadio espectral rho(T_J) = {radio_espectral_j:.6f}")
+if radio_espectral_j < 1:
+    print("Diagnostico: rho < 1 -> El metodo CONVERGE.")
+else:
+    print("Diagnostico: rho >= 1 -> El metodo NO CONVERGE.")
 
 print("\nValores iniciales:")
 x = float(input("Valor inicial de x: "))
@@ -39,13 +60,11 @@ k = 0
 
 print("Iteraciones: ")
 
-
 while k < max_iteraciones:
 
     x_anterior = x
     y_anterior = y
     z_anterior = z
-
 
     x_nuevo = (d1 - b1 * y_anterior - c1 * z_anterior) / a1
     y_nuevo = (d2 - a2 * x_anterior - c2 * z_anterior) / b2
@@ -77,6 +96,7 @@ else:
     print("\n Se alcanzo el maximo de iteraciones sin cumplir la tolerancia.")
 
 print("\n Resultado final: ")
+print(f"Radio espectral rho(T_J) = {radio_espectral_j:.6f}")
 print(f"x = {x:.8f}")
 print(f"y = {y:.8f}")
 print(f"z = {z:.8f}")
